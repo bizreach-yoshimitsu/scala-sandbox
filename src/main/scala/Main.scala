@@ -1,5 +1,3 @@
-import scala.collection.immutable.{:: => DefaultCons}
-
 object Main {
 
   sealed trait MyList[+A] {
