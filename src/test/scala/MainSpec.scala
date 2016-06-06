@@ -39,20 +39,20 @@ class MainSpec extends PlaySpec {
     "foldRight" in {
       val list = MyCons(1, MyCons(2, MyCons(3, MyNil)))
       val expect = 2
-      val actual = list.foldRight2(0) {
+      val actual = list.foldRight(0) {
         case (n, z) => n - z
       }
       actual mustBe expect
     }
 
-    // "foldRight2" in {
-    //   val list = MyCons(1, MyCons(2, MyCons(3, MyNil)))
-    //   val expect = 2
-    //   val actual = list.foldRight(0) {
-    //     case (n, z) => n - z
-    //   }
-    //   actual mustBe expect
-    // }
+    "foldRight2" in {
+      val list = MyCons(1, MyCons(2, MyCons(3, MyNil)))
+      val expect = 2
+      val actual = list.foldRight2(0) {
+        case (n, z) => n - z
+      }
+      actual mustBe expect
+    }
 
     "map" in {
       val list = MyCons(1, MyCons(2, MyCons(3, MyNil)))

@@ -30,38 +30,29 @@ sealed trait MyList[+A] {
     }
   }
 
-  // def foldRight2[B](z: B)(f: (A, B) => B): B = {
-  //   def inner(acc: B => B, left: MyList[A]): A => B = {
-  //     left match {
-  //       case MyNil => (a: A) => {
-  //         val result = f(a, acc(z))
-  //         println(s"a = $a, z = $z, result = $result")
-  //         result
-  //       }
-  //       case MyCons(h, t) => inner((b: B) => {
-  //         val accb = acc(b)
-  //         val result = f(h, accb)
-  //         println(s"h = $h, acc(b) = $accb, result = $result")
-  //         result
-  //       }, t)
-  //     }
-  //   }
-  //   inner((b: B) => b, tail)(head)
-  //   // a1, a2, a3
-  //   // f(a1, f(a2, f(a3, z)))
-  // }
+  def foldRight2[B](z: B)(f: (A, B) => B): B = {
+    def inner(acc: B => B, target: A, left: MyList[A]): B => B = {
+      val g = (b: B) => acc(f(target, b))
+      left match {
+        case MyNil => g
+        case MyCons(h, t) => inner(g, h, t)
+      }
+    }
+    inner((b: B) => b, head, tail)(z)
+  }
 
   def map[B](f: A => B): MyList[B] = {
     val nil: MyList[B] = MyNil
-    this.reverse.foldLeft(nil) {
-      case (z, a) => MyCons(f(a), z)
+    this.foldRight(nil) {
+      case (a, z) => MyCons(f(a), z)
     }
   }
 
-  def :::[A](tail: MyList[A]): MyList[A] = ???
+  def map2[B](f: A => B): MyList[B] = ???
   def flatMap[B](f: A => MyList[B]): MyList[B] = ???
   def filter(f: A => Boolean): MyList[A] = ???
   def withFilter(f: A => Boolean): MyList[A] = ???
+  def :::[A](tail: MyList[A]): MyList[A] = ???
 }
 
 case object MyNil extends MyList[Nothing] {
