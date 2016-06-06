@@ -1,5 +1,7 @@
 package ml
 
+import scala.{:: => _}
+
 sealed trait MyList[+A] {
 
   def head: A
@@ -19,18 +21,12 @@ sealed trait MyList[+A] {
 
   def reverse: MyList[A] = {
     val nil: MyList[A] = MyNil
-    this.foldLeft(nil) {
+    foldLeft(nil) {
       case (z, a) => MyCons(a, z)
     }
   }
 
   def foldRight[B](z: B)(f: (A, B) => B): B = {
-    this.reverse.foldLeft(z) {
-      case (z, c) => f(c, z)
-    }
-  }
-
-  def foldRight2[B](z: B)(f: (A, B) => B): B = {
     def inner(acc: B => B, target: A, left: MyList[A]): B => B = {
       val g = (b: B) => acc(f(target, b))
       left match {
@@ -41,18 +37,44 @@ sealed trait MyList[+A] {
     inner((b: B) => b, head, tail)(z)
   }
 
+  def foldRight2[B](z: B)(f: (A, B) => B): B = {
+    reverse.foldLeft(z) {
+      case (z, c) => f(c, z)
+    }
+  }
+
   def map[B](f: A => B): MyList[B] = {
     val nil: MyList[B] = MyNil
-    this.foldRight(nil) {
+    foldRight(nil) {
       case (a, z) => MyCons(f(a), z)
     }
   }
 
   def map2[B](f: A => B): MyList[B] = ???
-  def flatMap[B](f: A => MyList[B]): MyList[B] = ???
+
+  def flatMap[B](f: A => MyList[B]): MyList[B] = {
+    def inner(acc: MyList[B], target: A, left: MyList[A]): MyList[B] = {
+      val mapped = acc ::: f(target)
+      left match {
+        case MyNil => mapped
+        case MyCons(h, t) => inner(mapped, h, t)
+      }
+    }
+    inner(MyNil, head, tail)
+  }
+
   def filter(f: A => Boolean): MyList[A] = ???
   def withFilter(f: A => Boolean): MyList[A] = ???
-  def :::[A](tail: MyList[A]): MyList[A] = ???
+
+  def :::[B >: A](appends: MyList[B]): MyList[B] = {
+    appends.foldRight(this) {
+      case (a, z) => {
+        MyCons(a.asInstanceOf[A], z)
+      }
+    }
+  }
+
+  def add[B >: A](append: B): MyList[B] = ???
 }
 
 case object MyNil extends MyList[Nothing] {
