@@ -1,10 +1,9 @@
-import org.scalatestplus.play.PlaySpec
+import org.scalatest.{ MustMatchers, WordSpec }
 
-class MainSpec extends PlaySpec {
-
+class MainSpec extends WordSpec with MustMatchers {
   "hello" must {
-    "world" in {
-      "hello world" mustBe "hello world" 
+    "sandbox" in {
+      1 mustBe 1
     }
   }
 }
